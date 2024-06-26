@@ -15,6 +15,8 @@
 
 ["Quick" Start](#quick-start)
 
+[Service Account Key Format](#service-account-key-format)
+
 [Storing Your Key And Keeping It Safe](#storing-your-key-and-keeping-it-safe)
 
 [Modules, Components, Code Samples](#module-components-code-samples)
@@ -159,17 +161,53 @@ There are a number of steps involved. Here they are, condensed:
 
 
 
+# Service Account Key File Format<a name="service-account-key-format"></a>
+
+The downloaded json file has this format:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "PROJECT_ID",
+  "private_key_id": "KEY_ID",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nPRIVATE_KEY\n-----END PRIVATE KEY-----\n",
+  "client_email": "SERVICE_ACCOUNT_EMAIL",
+  "client_id": "CLIENT_ID",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/SERVICE_ACCOUNT_EMAIL"
+}
+
+```
+
+
+
 # Storing Your Key And Keeping It Safe<a name="storing-your-key-and-keeping-it-safe"></a>
 
 **Your key should remain private.  If you are using version control, such as *git*, you should keep the key out of your repository so that you do not accidentally share it.**
 One way to do this is to put it in a private folder that will not be included in your repository.
-1. In the **Resources** folder for your project, add a folder called **Private**
-2. In your **.gitignore** file for your project, add the follwing line:
-``Resources/Private``
-3. Put your key into that folder
-4. **Check the modified file list for your repository to make sure that your .gitignore includes `Resources/Private` and that your key does not appear in the list.**
+1. Have a folder that contains both the repo for your project and your private files. The Private folder will not be included in your git repo
 
+   ```bash
+   └── myProject
+       ├── Private
+       │      Your key goes here
+       └── Repo
+           ├── .git 
+           ├── .gitignore
+           ├── Documentation
+           ├── Project
+           ├── Resources
+           ├── Settings
+           └── ...
+   ```
 
+   
+
+2. Put your key file in the **Private** folder, keeping it outside of the repo, but still letting you access it, easily.
+
+   
 
 # Modules/Components/Code Samples<a name="module-components-code-samples"></a>
 
@@ -200,8 +238,10 @@ If you are not going to use a pre-built class to access Google (such as [Mikey's
 
   ***Example:***
 ```
-    $keyFile:=File("/RESOURCES/Private/<yourfilename>.json")
-    ASSERT ($keyFile.exists)
+$folder := Folder ( Folder ( "/PACKAGE/" ) .platformPath ; fk platform path ) .parent .folder ( "Private" )
+$file := File ( $folder.path + $1 )
+ASSERT ( $file.exists )
+$fileData := $file.getText()
 ```
 2. Use the key to create a signed JWT using the [JWT  Plugin](https://github.com/miyako/4d-plugin-jwt)
 
